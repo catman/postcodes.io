@@ -4,3 +4,7 @@ docker run -d -e POSTGRES_DB=mydb -e POSTGRES_USER=pguser -e POSTGRES_PASSWORD=p
 docker build -t david/postcodedb:v1 .
  docker run -d --name postcode-db david/postcodedb:v1
 https://www.digitalocean.com/community/tutorials/how-to-use-systemctl-to-manage-systemd-services-and-units
+https://askubuntu.com/questions/795226/how-to-list-all-enabled-services-from-systemctl
+
+# --rm remove intermediate containers
+docker build --rm -t david/postgresql .

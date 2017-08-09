@@ -1,42 +1,71 @@
+# "ported" by Adam Miller <maxamillion@fedoraproject.org> from
+#   https://github.com/fedora-cloud/Fedora-Dockerfiles
+#
+# Originally written for Fedora-Dockerfiles by
+#   scollier <scollier@redhat.com>
+#
+# part 1 copied from The CentOS Project <cloud-ops@centos.org>
 # Dockerfile for Centos7 system with postgres >= 9.6 GPS -> postcode library on https://github.com/catman/postcodes.io
-FROM david/postgresql
-MAINTAINER catman@rabbich.com
 
-# Perform updates
+# ======
+# part 1
+# ======
+FROM centos:centos7
+MAINTAINER catman @ rabbich.com
+
 RUN yum -y update; yum clean all
+RUN yum -y install sudo epel-release; yum clean all
+RUN yum -y install postgresql-server postgresql postgresql-contrib supervisor pwgen; yum clean all
 
-# Install EPEL 
-RUN yum -y install epel-release; yum clean all
+ADD ./postgresql-setup /usr/bin/postgresql-setup
+ADD ./supervisord.conf /etc/supervisord.conf
+ADD ./start_postgres.sh /start_postgres.sh
 
-RUN yum -y install git
+#Sudo requires a tty. fix that.
+RUN sed -i 's/.*requiretty$/#Defaults requiretty/' /etc/sudoers
+RUN chmod +x /usr/bin/postgresql-setup
+RUN chmod +x /start_postgres.sh
 
-# # install the postgres 
-# RUN rpm -ivh https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm
-# RUN yum -y install postgresql96 postgresql96-server postgresql96-libs postgresql96-contrib postgresql96-devel
+RUN /usr/bin/postgresql-setup initdb
 
-RUN yum -y install net-tools; yum clean all
-RUN yum -y install nodejs; yum clean all
-RUN yum -y install npm; yum clean all
-RUN yum -y install ogr_fdw96; yum clean all
-RUN yum -y install postgis2_96; yum clean all
+ADD ./postgresql.conf /var/lib/pgsql/data/postgresql.conf
+
+RUN chown -v postgres.postgres /var/lib/pgsql/data/postgresql.conf
+
+RUN echo "host    all             all             0.0.0.0/0               md5" >> /var/lib/pgsql/data/pg_hba.conf
+
+VOLUME ["/var/lib/pgsql"]
+
+EXPOSE 5432
+
+# ======
+# part 2
+# ======
+ENV POSTGRES_DB pgdb
+ENV POSTGRES_USER pguser
+ENV POSTGRES_PASSWORD pgpass
+ENV DB_USER pguser
+ENV DB_PASS pgpass
+ENV DB_NAME pgdb
+
+RUN yum -y install git; yum clean all
+RUN yum -y install net-tools nodejs npm ogr_fdw96 postgis2_96; yum clean all
 RUN yum -y install bash; yum clean all
+RUN yum -y install which; yum clean all
 
 WORKDIR /root
 
 RUN git clone https://github.com/catman/postcodes.io.git
-ENV POSTGRES_USER postgres
-ENV DB_USER username
-ENV DB_PASS password
-ENV DB_NAME mydb
 
 RUN useradd -ms /bin/bash postcode-user
 
 WORKDIR /root/postcodes.io
 
+# download the data
 RUN npm install
-# ENTRYPOINT ["npm run setup"]
-CMD "npm run setup"
+
+#
+CMD ["/bin/bash", "/start_postgres.sh"]
 
 USER postcode-user
 
-# docker run --name postgresql -d <yourname>/postgresql
