@@ -15,7 +15,13 @@ MAINTAINER catman @ rabbich.com
 
 RUN yum -y update; yum clean all
 RUN yum -y install sudo epel-release; yum clean all
-RUN yum -y install postgresql-server postgresql postgresql-contrib supervisor pwgen; yum clean all
+
+WORKDIR /root
+RUN rpm -ivh https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm
+RUN sudo yum list | grep pgdg96
+
+RUN yum -y install postgresql96 postgresql96-server postgresql96-libs postgresql96-contrib postgresql96-devel; yum clean all
+RUN yum -y install supervisor pwgen; yum clean all
 
 ADD ./postgresql-setup /usr/bin/postgresql-setup
 ADD ./supervisord.conf /etc/supervisord.conf
@@ -34,6 +40,9 @@ RUN chown -v postgres.postgres /var/lib/pgsql/data/postgresql.conf
 
 RUN echo "host    all             all             0.0.0.0/0               md5" >> /var/lib/pgsql/data/pg_hba.conf
 
+# local access to postgres
+RUN echo "local   all             postgres                                md5" >> /var/lib/pgsql/data/pg_hba.conf
+
 VOLUME ["/var/lib/pgsql"]
 
 EXPOSE 5432
@@ -41,17 +50,18 @@ EXPOSE 5432
 # ======
 # part 2
 # ======
-ENV POSTGRES_DB pgdb
-ENV POSTGRES_USER pguser
-ENV POSTGRES_PASSWORD pgpass
-ENV DB_USER pguser
+ENV POSTGRES_DB pgpostcode
+ENV DB_NAME pgpostcode
+
+ENV DB_USER postgres
+ENV POSTGRES_USER postgres
+
 ENV DB_PASS pgpass
-ENV DB_NAME pgdb
+ENV POSTGRES_PASSWORD pgpass
 
 RUN yum -y install git; yum clean all
 RUN yum -y install net-tools nodejs npm ogr_fdw96 postgis2_96; yum clean all
-RUN yum -y install bash; yum clean all
-RUN yum -y install which; yum clean all
+RUN yum -y install bash which; yum clean all
 
 WORKDIR /root
 

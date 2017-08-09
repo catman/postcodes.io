@@ -25,8 +25,8 @@ const config = {
 		root: rootPath,
 		googleAnalyticsKey: "",
 		postgres: {
-			user: "postcodesio",
-			password: "password",
+			user: "pguser",
+			password: "pgpass",
 			database: "postcodesiodb",	// Database name
 			host: "localhost",
 			port: 5432
@@ -52,8 +52,8 @@ const config = {
 		root: rootPath,
 		googleAnalyticsKey: "",
 		postgres: {
-			user: "postcodesio",
-			password: "password",
+			user: "pguser",
+			password: "pgpass",
 			database: "postcodeio_testing",
 			host: "localhost",
 			port: 5432
@@ -78,8 +78,8 @@ const config = {
 		root: rootPath,
 		googleAnalyticsKey: "",
 		postgres: {
-			user: "postcodesio",
-			password: "password",
+			user: "pguser",
+			password: "pgpass",
 			database: "postcodesiodb",
 			host: "localhost",
 			port: 5432

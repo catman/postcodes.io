@@ -8,3 +8,4 @@ https://askubuntu.com/questions/795226/how-to-list-all-enabled-services-from-sys
 
 # --rm remove intermediate containers
 docker build --rm -t david/postgresql .
+docker run -d --name postcode-inst david/postcode-db:v4

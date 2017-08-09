@@ -23,7 +23,6 @@ if [ -n "${DB_USER}" ]; then
     echo "CREATE ROLE ${DB_USER} with CREATEROLE login superuser PASSWORD '${DB_PASS}';" |
       sudo -u postgres -H postgres --single \
        -c config_file=${PG_CONFDIR}/postgresql.conf -D ${PG_CONFDIR}
-  
 fi
 
 if [ -n "${DB_NAME}" ]; then
@@ -40,7 +39,6 @@ if [ -n "${DB_NAME}" ]; then
   fi
 fi
 }
-
 
 __run_supervisor() {
 supervisord
