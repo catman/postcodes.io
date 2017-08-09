@@ -45,7 +45,7 @@ PGPORT="5432"
 # fi
 
 # Log file for initdb
-PGLOG=1>
+PGLOG=stdout
 # PGLOG=/var/lib/pgsql/initdb.log
 
 # Log file for pg_upgrade
